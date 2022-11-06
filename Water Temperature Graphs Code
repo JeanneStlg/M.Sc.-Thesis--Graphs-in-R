@@ -1,0 +1,837 @@
+
+###
+#Step 1: Packages to download
+###
+
+library(ggplot2)
+library(dplyr)
+library(scales)
+library(tidyr)
+library(gridExtra)
+library(ggpubr)
+
+###
+#Step 2: Load Data
+###
+TidBit_Data <- read.csv("pathway.csv")
+
+###
+#Step 3: Clean Data
+###
+
+#Remove the dates outside of the study & the meaningless columns and rows
+#Adapt the names of the columns
+#Remove repeated rows
+
+#End result:
+##Rows: Data collected at specific times on specific days
+##Column: Data categorized by TidbiT for all 12 TidbiTs
+###TidbiT 10433196: Amphipod Cage
+###TidbiT 11004128: Snail Cage
+###TidbiT 11004139: Amphipod Cage
+###TidbiT 20163866: Snail Cage
+###TidbiT 20186818: Snail Cage
+###TidbiT 20211765: Amphipod Cage
+###TidbiT 20332244: Amphipod Cage
+###TidbiT 20332249: Snail Cage
+###TidbiT 20359716: Snail Cage
+###TidbiT 20544153: Snail Cage
+###TidbiT 20544154: Snail Cage
+###TidbiT 20576731: Snail Cage
+##Dimension: 2090x13
+##Type: character
+
+###
+#Step 4: Process Data Logger 20576731
+###
+
+#Step 4.1: Select data specific to TidbiT 20576731
+DataLog20576731=TidBit_Data[,1:13]
+DataLog20576731=DataLog20576731[,-c(2:12)]
+
+#Step 4.2: Adapt date and time
+#Note: the data was saved under two different formats
+##Data of July 2022 was saved as "DD/MM/YY HH:MM:SS" for every 10 minutes
+##Data of August 2022 was saved as "D/M/YYYY H:MM" for every 10 minutes
+#This step adapts the code in two columns: one for the date and one for the time
+#One uniform format for all dates and times was selected
+##Date: "DD/MM/YYYY"
+##Time: "HH:MM"
+
+#Double the first column
+DataLog20576731=cbind(DataLog20576731$`TidBit Number`,DataLog20576731)
+
+#Adapt column names
+names(DataLog20576731)=c("Date","Time","Temperature")
+
+#Remove the date from the time column
+DataLog20576731$Time<-gsub("25/07/22 ","",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("26/07/22 ","",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("27/07/22 ","",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("28/07/22 ","",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("29/07/22 ","",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("30/07/22 ","",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("31/07/22 ","",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("1/8/2022 ","",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("2/8/2022 ","",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("3/8/2022 ","",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("4/8/2022 ","",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("5/8/2022 ","",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("6/8/2022 ","",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("7/8/2022 ","",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("8/8/2022 ","",as.character(DataLog20576731$Time))
+
+#Remove the time from the date column
+#July System
+DataLog20576731$Date<-gsub(" 00:00:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 00:10:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 00:20:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 00:30:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 00:40:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 00:50:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 01:00:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 01:10:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 01:20:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 01:30:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 01:40:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 01:50:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 02:00:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 02:10:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 02:20:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 02:30:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 02:40:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 02:50:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 03:00:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 03:10:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 03:20:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 03:30:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 03:40:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 03:50:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 04:00:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 04:10:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 04:20:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 04:30:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 04:40:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 04:50:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 05:00:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 05:10:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 05:20:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 05:30:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 05:40:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 05:50:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 06:00:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 06:10:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 06:20:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 06:30:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 06:40:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 06:50:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 07:00:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 07:10:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 07:20:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 07:30:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 07:40:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 07:50:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 08:00:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 08:10:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 08:20:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 08:30:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 08:40:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 08:50:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 09:00:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 09:10:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 09:20:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 09:30:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 09:40:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 09:50:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 10:00:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 10:10:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 10:20:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 10:30:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 10:40:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 10:50:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 11:00:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 11:10:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 11:20:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 11:30:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 11:40:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 11:50:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 12:00:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 12:10:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 12:20:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 12:30:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 12:40:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 12:50:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 13:00:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 13:10:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 13:20:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 13:30:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 13:40:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 13:50:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 14:00:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 14:10:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 14:20:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 14:30:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 14:40:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 14:50:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 15:00:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 15:10:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 15:20:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 15:30:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 15:40:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 15:50:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 16:00:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 16:10:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 16:20:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 16:30:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 16:40:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 16:50:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 17:00:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 17:10:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 17:20:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 17:30:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 17:40:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 17:50:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 18:00:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 18:10:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 18:20:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 18:30:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 18:40:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 18:50:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 19:00:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 19:10:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 19:20:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 19:30:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 19:40:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 19:50:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 20:00:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 20:10:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 20:20:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 20:30:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 20:40:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 20:50:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 21:00:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 21:10:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 21:20:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 21:30:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 21:40:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 21:50:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 22:00:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 22:10:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 22:20:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 22:30:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 22:40:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 22:50:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 23:00:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 23:10:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 23:20:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 23:30:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 23:40:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 23:50:00","",as.character(DataLog20576731$Date))
+
+#August System
+DataLog20576731$Date<-gsub(" 0:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 0:10","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 0:20","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 0:30","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 0:40","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 0:50","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 1:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 1:10","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 1:20","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 1:30","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 1:40","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 1:50","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 2:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 2:10","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 2:20","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 2:30","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 2:40","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 2:50","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 3:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 3:10","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 3:20","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 3:30","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 3:40","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 3:50","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 4:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 4:10","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 4:20","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 4:30","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 4:40","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 4:50","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 5:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 5:10","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 5:20","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 5:30","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 5:40","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 5:50","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 6:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 6:10","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 6:20","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 6:30","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 6:40","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 6:50","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 7:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 7:10","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 7:20","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 7:30","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 7:40","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 7:50","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 8:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 8:10","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 8:20","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 8:30","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 8:40","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 8:50","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 9:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 9:10","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 9:20","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 9:30","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 9:40","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 9:50","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 10:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 10:10","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 10:20","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 10:30","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 10:40","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 10:50","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 11:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 11:10","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 11:20","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 11:30","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 11:40","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 11:50","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 12:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 12:10","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 12:20","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 12:30","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 12:40","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 12:50","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 13:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 13:10","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 13:20","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 13:30","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 13:40","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 13:50","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 14:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 14:10","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 14:20","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 14:30","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 14:40","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 14:50","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 15:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 15:10","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 15:20","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 15:30","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 15:40","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 15:50","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 16:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 16:10","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 16:20","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 16:30","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 16:40","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 16:50","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 17:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 17:10","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 17:20","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 17:30","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 17:40","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 17:50","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 18:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 18:10","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 18:20","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 18:30","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 18:40","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 18:50","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 19:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 19:10","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 19:20","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 19:30","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 19:40","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 19:50","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 20:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 20:10","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 20:20","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 20:30","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 20:40","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 20:50","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 21:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 21:10","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 21:20","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 21:30","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 21:40","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 21:50","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 22:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 22:10","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 22:20","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 22:30","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 22:40","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 22:50","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 23:00","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 23:10","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 23:20","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 23:30","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 23:40","",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub(" 23:50","",as.character(DataLog20576731$Date))
+
+#Make the dates consistent in July and August (format "DD/MM/YYYY")
+DataLog20576731$Date<-gsub("25/07/22","25/07/2022",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub("26/07/22","26/07/2022",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub("27/07/22","27/07/2022",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub("28/07/22","28/07/2022",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub("29/07/22","29/07/2022",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub("30/07/22","30/07/2022",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub("31/07/22","31/07/2022",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub("1/8/2022","01/08/2022",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub("2/8/2022","02/08/2022",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub("3/8/2022","03/08/2022",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub("4/8/2022","04/08/2022",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub("5/8/2022","05/08/2022",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub("6/8/2022","06/08/2022",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub("7/8/2022","07/08/2022",as.character(DataLog20576731$Date))
+DataLog20576731$Date<-gsub("8/8/2022","08/08/2022",as.character(DataLog20576731$Date))
+
+#Make the time consistent in July and August (format: "HH:MM")
+#July System
+DataLog20576731$Time<-gsub("00:00:00","00:00",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("00:10:00","00:10",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("00:20:00","00:20",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("00:30:00","00:30",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("00:40:00","00:40",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("00:50:00","00:50",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("01:00:00","01:00",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("01:10:00","01:10",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("01:20:00","01:20",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("01:30:00","01:30",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("01:40:00","01:40",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("01:50:00","01:50",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("02:00:00","02:00",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("02:10:00","02:10",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("02:20:00","02:20",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("02:30:00","02:30",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("02:40:00","02:40",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("02:50:00","02:50",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("03:00:00","03:00",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("03:10:00","03:10",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("03:20:00","03:20",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("03:30:00","03:30",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("03:40:00","03:40",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("03:50:00","03:50",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("04:00:00","04:00",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("04:10:00","04:10",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("04:20:00","04:20",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("04:30:00","04:30",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("04:40:00","04:40",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("04:50:00","04:50",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("05:00:00","05:00",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("05:10:00","05:10",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("05:20:00","05:20",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("05:30:00","05:30",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("05:40:00","05:40",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("05:50:00","05:50",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("06:00:00","06:00",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("06:10:00","06:10",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("06:20:00","06:20",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("06:30:00","06:30",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("06:40:00","06:40",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("06:50:00","06:50",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("07:00:00","07:00",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("07:10:00","07:10",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("07:20:00","07:20",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("07:30:00","07:30",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("07:40:00","07:40",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("07:50:00","07:50",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("08:00:00","08:00",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("08:10:00","08:10",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("08:20:00","08:20",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("08:30:00","08:30",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("08:40:00","08:40",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("08:50:00","08:50",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("09:00:00","09:00",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("09:10:00","09:10",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("09:20:00","09:20",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("09:30:00","09:30",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("09:40:00","09:40",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("09:50:00","09:50",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("10:00:00","10:00",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("10:10:00","10:10",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("10:20:00","10:20",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("10:30:00","10:30",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("10:40:00","10:40",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("10:50:00","10:50",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("11:00:00","11:00",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("11:10:00","11:10",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("11:20:00","11:20",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("11:30:00","11:30",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("11:40:00","11:40",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("11:50:00","11:50",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("12:00:00","12:00",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("12:10:00","12:10",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("12:20:00","12:20",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("12:30:00","12:30",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("12:40:00","12:40",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("12:50:00","12:50",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("13:00:00","13:00",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("13:10:00","13:10",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("13:20:00","13:20",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("13:30:00","13:30",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("13:40:00","13:40",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("13:50:00","13:50",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("14:00:00","14:00",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("14:10:00","14:10",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("14:20:00","14:20",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("14:30:00","14:30",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("14:40:00","14:40",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("14:50:00","14:50",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("15:00:00","15:00",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("15:10:00","15:10",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("15:20:00","15:20",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("15:30:00","15:30",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("15:40:00","15:40",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("15:50:00","15:50",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("16:00:00","16:00",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("16:10:00","16:10",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("16:20:00","16:20",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("16:30:00","16:30",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("16:40:00","16:40",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("16:50:00","16:50",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("17:00:00","17:00",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("17:10:00","17:10",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("17:20:00","17:20",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("17:30:00","17:30",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("17:40:00","17:40",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("17:50:00","17:50",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("18:00:00","18:00",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("18:10:00","18:10",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("18:20:00","18:20",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("18:30:00","18:30",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("18:40:00","18:40",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("18:50:00","18:50",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("19:00:00","19:00",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("19:10:00","19:10",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("19:20:00","19:20",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("19:30:00","19:30",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("19:40:00","19:40",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("19:50:00","19:50",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("20:00:00","20:00",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("20:10:00","20:10",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("20:20:00","20:20",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("20:30:00","20:30",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("20:40:00","20:40",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("20:50:00","20:50",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("21:00:00","21:00",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("21:10:00","21:10",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("21:20:00","21:20",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("21:30:00","21:30",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("21:40:00","21:40",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("21:50:00","21:50",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("22:00:00","22:00",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("22:10:00","22:10",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("22:20:00","22:20",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("22:30:00","22:30",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("22:40:00","22:40",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("22:50:00","22:50",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("23:00:00","23:00",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("23:10:00","23:10",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("23:20:00","23:20",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("23:30:00","23:30",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("23:40:00","23:40",as.character(DataLog20576731$Time))
+DataLog20576731$Time<-gsub("23:50:00","23:50",as.character(DataLog20576731$Time))
+
+#August System
+for(i in 1:nrow(DataLog20576731)){
+  if(DataLog20576731[i,2]=="0:00"){DataLog20576731[i,2]=gsub("0:00","00:00",as.character(DataLog20576731[i,2]))}
+  if(DataLog20576731[i,2]=="0:10"){DataLog20576731[i,2]=gsub("0:10","00:10",as.character(DataLog20576731[i,2]))}
+  if(DataLog20576731[i,2]=="0:20"){DataLog20576731[i,2]=gsub("0:20","00:20",as.character(DataLog20576731[i,2]))}
+  if(DataLog20576731[i,2]=="0:30"){DataLog20576731[i,2]=gsub("0:30","00:30",as.character(DataLog20576731[i,2]))}
+  if(DataLog20576731[i,2]=="0:40"){DataLog20576731[i,2]=gsub("0:40","00:40",as.character(DataLog20576731[i,2]))}
+  if(DataLog20576731[i,2]=="0:50"){DataLog20576731[i,2]=gsub("0:50","00:50",as.character(DataLog20576731[i,2]))}
+  if(DataLog20576731[i,2]=="1:00"){DataLog20576731[i,2]=gsub("1:00","01:00",as.character(DataLog20576731[i,2]))}
+  if(DataLog20576731[i,2]=="1:10"){DataLog20576731[i,2]=gsub("1:10","01:10",as.character(DataLog20576731[i,2]))}
+  if(DataLog20576731[i,2]=="1:20"){DataLog20576731[i,2]=gsub("1:20","01:20",as.character(DataLog20576731[i,2]))}
+  if(DataLog20576731[i,2]=="1:30"){DataLog20576731[i,2]=gsub("1:30","01:30",as.character(DataLog20576731[i,2]))}
+  if(DataLog20576731[i,2]=="1:40"){DataLog20576731[i,2]=gsub("1:40","01:40",as.character(DataLog20576731[i,2]))}
+  if(DataLog20576731[i,2]=="1:50"){DataLog20576731[i,2]=gsub("1:50","01:50",as.character(DataLog20576731[i,2]))}
+  if(DataLog20576731[i,2]=="2:00"){DataLog20576731[i,2]=gsub("2:00","02:00",as.character(DataLog20576731[i,2]))}
+  if(DataLog20576731[i,2]=="2:10"){DataLog20576731[i,2]=gsub("2:10","02:10",as.character(DataLog20576731[i,2]))}
+  if(DataLog20576731[i,2]=="2:20"){DataLog20576731[i,2]=gsub("2:20","02:20",as.character(DataLog20576731[i,2]))}
+  if(DataLog20576731[i,2]=="2:30"){DataLog20576731[i,2]=gsub("2:30","02:30",as.character(DataLog20576731[i,2]))}
+  if(DataLog20576731[i,2]=="2:40"){DataLog20576731[i,2]=gsub("2:40","02:40",as.character(DataLog20576731[i,2]))}
+  if(DataLog20576731[i,2]=="2:50"){DataLog20576731[i,2]=gsub("2:50","02:50",as.character(DataLog20576731[i,2]))}
+  if(DataLog20576731[i,2]=="3:00"){DataLog20576731[i,2]=gsub("3:00","03:00",as.character(DataLog20576731[i,2]))}
+  if(DataLog20576731[i,2]=="3:10"){DataLog20576731[i,2]=gsub("3:10","03:10",as.character(DataLog20576731[i,2]))}
+  if(DataLog20576731[i,2]=="3:20"){DataLog20576731[i,2]=gsub("3:20","03:20",as.character(DataLog20576731[i,2]))}
+  if(DataLog20576731[i,2]=="3:30"){DataLog20576731[i,2]=gsub("3:30","03:30",as.character(DataLog20576731[i,2]))}
+  if(DataLog20576731[i,2]=="3:40"){DataLog20576731[i,2]=gsub("3:40","03:40",as.character(DataLog20576731[i,2]))}
+  if(DataLog20576731[i,2]=="3:50"){DataLog20576731[i,2]=gsub("3:50","03:50",as.character(DataLog20576731[i,2]))}
+  if(DataLog20576731[i,2]=="4:00"){DataLog20576731[i,2]=gsub("4:00","04:00",as.character(DataLog20576731[i,2]))}
+  if(DataLog20576731[i,2]=="4:10"){DataLog20576731[i,2]=gsub("4:10","04:10",as.character(DataLog20576731[i,2]))}
+  if(DataLog20576731[i,2]=="4:20"){DataLog20576731[i,2]=gsub("4:20","04:20",as.character(DataLog20576731[i,2]))}
+  if(DataLog20576731[i,2]=="4:30"){DataLog20576731[i,2]=gsub("4:30","04:30",as.character(DataLog20576731[i,2]))}
+  if(DataLog20576731[i,2]=="4:40"){DataLog20576731[i,2]=gsub("4:40","04:40",as.character(DataLog20576731[i,2]))}
+  if(DataLog20576731[i,2]=="4:50"){DataLog20576731[i,2]=gsub("4:50","04:50",as.character(DataLog20576731[i,2]))}
+  if(DataLog20576731[i,2]=="5:00"){DataLog20576731[i,2]=gsub("5:00","05:00",as.character(DataLog20576731[i,2]))}
+  if(DataLog20576731[i,2]=="5:10"){DataLog20576731[i,2]=gsub("5:10","05:10",as.character(DataLog20576731[i,2]))}
+  if(DataLog20576731[i,2]=="5:20"){DataLog20576731[i,2]=gsub("5:20","05:20",as.character(DataLog20576731[i,2]))}
+  if(DataLog20576731[i,2]=="5:30"){DataLog20576731[i,2]=gsub("5:30","05:30",as.character(DataLog20576731[i,2]))}
+  if(DataLog20576731[i,2]=="5:40"){DataLog20576731[i,2]=gsub("5:40","05:40",as.character(DataLog20576731[i,2]))}
+  if(DataLog20576731[i,2]=="5:50"){DataLog20576731[i,2]=gsub("5:50","05:50",as.character(DataLog20576731[i,2]))}
+  if(DataLog20576731[i,2]=="6:00"){DataLog20576731[i,2]=gsub("6:00","06:00",as.character(DataLog20576731[i,2]))}
+  if(DataLog20576731[i,2]=="6:10"){DataLog20576731[i,2]=gsub("6:10","06:10",as.character(DataLog20576731[i,2]))}
+  if(DataLog20576731[i,2]=="6:20"){DataLog20576731[i,2]=gsub("6:20","06:20",as.character(DataLog20576731[i,2]))}
+  if(DataLog20576731[i,2]=="6:30"){DataLog20576731[i,2]=gsub("6:30","06:30",as.character(DataLog20576731[i,2]))}
+  if(DataLog20576731[i,2]=="6:40"){DataLog20576731[i,2]=gsub("6:40","06:40",as.character(DataLog20576731[i,2]))}
+  if(DataLog20576731[i,2]=="6:50"){DataLog20576731[i,2]=gsub("6:50","06:50",as.character(DataLog20576731[i,2]))}
+  if(DataLog20576731[i,2]=="7:00"){DataLog20576731[i,2]=gsub("7:00","07:00",as.character(DataLog20576731[i,2]))}
+  if(DataLog20576731[i,2]=="7:10"){DataLog20576731[i,2]=gsub("7:10","07:10",as.character(DataLog20576731[i,2]))}
+  if(DataLog20576731[i,2]=="7:20"){DataLog20576731[i,2]=gsub("7:20","07:20",as.character(DataLog20576731[i,2]))}
+  if(DataLog20576731[i,2]=="7:30"){DataLog20576731[i,2]=gsub("7:30","07:30",as.character(DataLog20576731[i,2]))}
+  if(DataLog20576731[i,2]=="7:40"){DataLog20576731[i,2]=gsub("7:40","07:40",as.character(DataLog20576731[i,2]))}
+  if(DataLog20576731[i,2]=="7:50"){DataLog20576731[i,2]=gsub("7:50","07:50",as.character(DataLog20576731[i,2]))}
+  if(DataLog20576731[i,2]=="8:00"){DataLog20576731[i,2]=gsub("8:00","08:00",as.character(DataLog20576731[i,2]))}
+  if(DataLog20576731[i,2]=="8:10"){DataLog20576731[i,2]=gsub("8:10","08:10",as.character(DataLog20576731[i,2]))}
+  if(DataLog20576731[i,2]=="8:20"){DataLog20576731[i,2]=gsub("8:20","08:20",as.character(DataLog20576731[i,2]))}
+  if(DataLog20576731[i,2]=="8:30"){DataLog20576731[i,2]=gsub("8:30","08:30",as.character(DataLog20576731[i,2]))}
+  if(DataLog20576731[i,2]=="8:40"){DataLog20576731[i,2]=gsub("8:40","08:40",as.character(DataLog20576731[i,2]))}
+  if(DataLog20576731[i,2]=="8:50"){DataLog20576731[i,2]=gsub("8:50","08:50",as.character(DataLog20576731[i,2]))}
+  if(DataLog20576731[i,2]=="9:00"){DataLog20576731[i,2]=gsub("9:00","09:00",as.character(DataLog20576731[i,2]))}
+  if(DataLog20576731[i,2]=="9:10"){DataLog20576731[i,2]=gsub("9:10","09:10",as.character(DataLog20576731[i,2]))}
+  if(DataLog20576731[i,2]=="9:20"){DataLog20576731[i,2]=gsub("9:20","09:20",as.character(DataLog20576731[i,2]))}
+  if(DataLog20576731[i,2]=="9:30"){DataLog20576731[i,2]=gsub("9:30","09:30",as.character(DataLog20576731[i,2]))}
+  if(DataLog20576731[i,2]=="9:40"){DataLog20576731[i,2]=gsub("9:40","09:40",as.character(DataLog20576731[i,2]))}
+  if(DataLog20576731[i,2]=="9:50"){DataLog20576731[i,2]=gsub("9:50","09:50",as.character(DataLog20576731[i,2]))}
+}
+
+#Step 4.3: Finish cleaning & adapting the row names for the dataset
+DataLog20576731=DataLog20576731[-c(1:2),]
+rownames(DataLog20576731)=c(1:nrow(DataLog20576731))
+
+###
+#Step 5: Repeat step 4 for all 12 TidbiTs
+###
+
+###
+#Step 6: Prepare one dataset with all the data
+###
+
+#Step 6.1: Add columns with the type of site, type of cage and TidbiT number as
+#per raw data
+DataLog11004128.2=cbind(DataLog11004128,DataLog11004128)
+DataLog11004128.2[,4]=c("Contaminated")
+DataLog11004128.2[,5]=c("Sinking")
+DataLog11004128.2[,6]=11004128
+names(DataLog11004128.2)=c("Date","Time","Temperature","Site","Cage Status","TidBit Number")
+
+DataLog20359716.2=cbind(DataLog20359716,DataLog20359716)
+DataLog20359716.2[,4]=c("Contaminated")
+DataLog20359716.2[,5]=c("Sinking")
+DataLog20359716.2[,6]=20359716
+names(DataLog20359716.2)=c("Date","Time","Temperature","Site","Cage Status","TidBit Number")
+
+DataLog20163866.2=cbind(DataLog20163866,DataLog20163866)
+DataLog20163866.2[,4]=c("Contaminated")
+DataLog20163866.2[,5]=c("Floating")
+DataLog20163866.2[,6]=20163866
+names(DataLog20163866.2)=c("Date","Time","Temperature","Site","Cage Status","TidBit Number")
+
+DataLog20332249.2=cbind(DataLog20332249,DataLog20332249)
+DataLog20332249.2[,4]=c("Contaminated")
+DataLog20332249.2[,5]=c("Floating")
+DataLog20332249.2[,6]=20332249
+names(DataLog20332249.2)=c("Date","Time","Temperature","Site","Cage Status","TidBit Number")
+
+DataLog20186818.2=cbind(DataLog20186818,DataLog20186818)
+DataLog20186818.2[,4]=c("Reference")
+DataLog20186818.2[,5]=c("Sinking")
+DataLog20186818.2[,6]=20186818
+names(DataLog20186818.2)=c("Date","Time","Temperature","Site","Cage Status","TidBit Number")
+
+DataLog20544153.2=cbind(DataLog20544153,DataLog20544153)
+DataLog20544153.2[,4]=c("Reference")
+DataLog20544153.2[,5]=c("Sinking")
+DataLog20544153.2[,6]=20544153
+names(DataLog20544153.2)=c("Date","Time","Temperature","Site","Cage Status","TidBit Number")
+
+DataLog20544154.2=cbind(DataLog20544154,DataLog20544154)
+DataLog20544154.2[,4]=c("Reference")
+DataLog20544154.2[,5]=c("Floating")
+DataLog20544154.2[,6]=20544154
+names(DataLog20544154.2)=c("Date","Time","Temperature","Site","Cage Status","TidBit Number")
+
+DataLog20576731.2=cbind(DataLog20576731,DataLog20576731)
+DataLog20576731.2[,4]=c("Reference")
+DataLog20576731.2[,5]=c("Floating")
+DataLog20576731.2[,6]=20576731
+names(DataLog20576731.2)=c("Date","Time","Temperature","Site","Cage Status","TidBit Number")
+
+#Step 6.2: Create the detailed dataset and define the temperatures as numeric
+Full.Data=rbind(DataLog11004128.2,DataLog20359716.2,DataLog20163866.2,DataLog20332249.2,DataLog20186818.2,DataLog20544153.2,DataLog20544154.2,DataLog20576731.2)
+Full.Data$Temperature=as.numeric(Full.Data$Temperature)
+
+###
+#Step 7: Prepare the datasets for each individual days
+###
+
+#Note: the study plan defined the first dosing day as Day 4, not Day 0.
+#Therefore, all the codes were written based on that day notation.
+#However, an addendum to the study plan was made after writing the codes, which is
+#why the titles in the graphs might refer to the corrected day notation, while the 
+#codes still refer to the initial day notation.
+
+#Step 7.1: Isolate the detailed data by date
+Day4=Full.Data[(Full.Data$Date=="25/07/2022")==TRUE,]
+Day5=Full.Data[(Full.Data$Date=="26/07/2022")==TRUE,]
+Day6=Full.Data[(Full.Data$Date=="27/07/2022")==TRUE,]
+Day7=Full.Data[(Full.Data$Date=="28/07/2022")==TRUE,]
+Day8=Full.Data[(Full.Data$Date=="29/07/2022")==TRUE,]
+Day9=Full.Data[(Full.Data$Date=="30/07/2022")==TRUE,]
+Day10=Full.Data[(Full.Data$Date=="31/07/2022")==TRUE,]
+Day11=Full.Data[(Full.Data$Date=="01/08/2022")==TRUE,]
+Day12=Full.Data[(Full.Data$Date=="02/08/2022")==TRUE,]
+Day13=Full.Data[(Full.Data$Date=="03/08/2022")==TRUE,]
+Day14=Full.Data[(Full.Data$Date=="04/08/2022")==TRUE,]
+Day15=Full.Data[(Full.Data$Date=="05/08/2022")==TRUE,]
+Day16=Full.Data[(Full.Data$Date=="06/08/2022")==TRUE,]
+Day17=Full.Data[(Full.Data$Date=="07/08/2022")==TRUE,]
+Day18=Full.Data[(Full.Data$Date=="08/08/2022")==TRUE,]
+
+#Step 7.2: Adapt the time to graph linearly in ggplot
+Day4$Time=as.POSIXct(paste0("2022-07-25",Day4$Time,tz="GMT"))
+Day5$Time=as.POSIXct(paste0("2022-07-26",Day5$Time,tz="GMT"))
+Day6$Time=as.POSIXct(paste0("2022-07-27",Day6$Time,tz="GMT"))
+Day7$Time=as.POSIXct(paste0("2022-07-28",Day7$Time,tz="GMT"))
+Day8$Time=as.POSIXct(paste0("2022-07-29",Day8$Time,tz="GMT"))
+Day9$Time=as.POSIXct(paste0("2022-07-30",Day9$Time,tz="GMT"))
+Day10$Time=as.POSIXct(paste0("2022-07-31",Day10$Time,tz="GMT"))
+Day11$Time=as.POSIXct(paste0("2022-08-01",Day11$Time,tz="GMT"))
+Day12$Time=as.POSIXct(paste0("2022-08-02",Day12$Time,tz="GMT"))
+Day13$Time=as.POSIXct(paste0("2022-08-03",Day13$Time,tz="GMT"))
+Day14$Time=as.POSIXct(paste0("2022-08-04",Day14$Time,tz="GMT"))
+Day15$Time=as.POSIXct(paste0("2022-08-05",Day15$Time,tz="GMT"))
+Day16$Time=as.POSIXct(paste0("2022-08-06",Day16$Time,tz="GMT"))
+Day17$Time=as.POSIXct(paste0("2022-08-07",Day17$Time,tz="GMT"))
+Day18$Time=as.POSIXct(paste0("2022-08-08",Day18$Time,tz="GMT"))
+
+###
+#Step 8: Graph all the data
+###
+
+#Note: Due to the TidbiTs not being in place for the entirety of Day 4 and Day 18,
+#these two days were removed from all graphs.
+
+#Step 8.1: Remove the data from Day 4 and Day 18
+Test1=Full.Data[(Full.Data$Date!="25/07/2022")==TRUE,]
+Test2=Test1[(Test1$Date!="08/08/2022")==TRUE,]
+
+#Step 8.2: Adapt the time to graph over 24 hours in ggplot
+
+#Note: The date was chosen arbitrarily
+
+Test2$Time=as.POSIXct(paste0("2022-07-30",Test2$Time,tz="GMT"))
+Test3=Test2
+
+#Step 8.3: Calculate the average temperature at the reference site at every hour
+
+Test4=Test3[1:24,1:2]
+names(Test4)=c("Average","Time")
+rownames(Test4)=c(1:24)
+
+Test4[,1]=c(mean(Test3[which(Test3$Time=="2022-07-30 00:00:00"&Test3$Site=="Reference"),3]),
+            mean(Test3[which(Test3$Time=="2022-07-30 01:00:00"&Test3$Site=="Reference"),3]),
+            mean(Test3[which(Test3$Time=="2022-07-30 02:00:00"&Test3$Site=="Reference"),3]),
+            mean(Test3[which(Test3$Time=="2022-07-30 03:00:00"&Test3$Site=="Reference"),3]),
+            mean(Test3[which(Test3$Time=="2022-07-30 04:00:00"&Test3$Site=="Reference"),3]),
+            mean(Test3[which(Test3$Time=="2022-07-30 05:00:00"&Test3$Site=="Reference"),3]),
+            mean(Test3[which(Test3$Time=="2022-07-30 06:00:00"&Test3$Site=="Reference"),3]),
+            mean(Test3[which(Test3$Time=="2022-07-30 07:00:00"&Test3$Site=="Reference"),3]),
+            mean(Test3[which(Test3$Time=="2022-07-30 08:00:00"&Test3$Site=="Reference"),3]),
+            mean(Test3[which(Test3$Time=="2022-07-30 09:00:00"&Test3$Site=="Reference"),3]),
+            mean(Test3[which(Test3$Time=="2022-07-30 10:00:00"&Test3$Site=="Reference"),3]),
+            mean(Test3[which(Test3$Time=="2022-07-30 11:00:00"&Test3$Site=="Reference"),3]),
+            mean(Test3[which(Test3$Time=="2022-07-30 12:00:00"&Test3$Site=="Reference"),3]),
+            mean(Test3[which(Test3$Time=="2022-07-30 13:00:00"&Test3$Site=="Reference"),3]),
+            mean(Test3[which(Test3$Time=="2022-07-30 14:00:00"&Test3$Site=="Reference"),3]),
+            mean(Test3[which(Test3$Time=="2022-07-30 15:00:00"&Test3$Site=="Reference"),3]),
+            mean(Test3[which(Test3$Time=="2022-07-30 16:00:00"&Test3$Site=="Reference"),3]),
+            mean(Test3[which(Test3$Time=="2022-07-30 17:00:00"&Test3$Site=="Reference"),3]),
+            mean(Test3[which(Test3$Time=="2022-07-30 18:00:00"&Test3$Site=="Reference"),3]),
+            mean(Test3[which(Test3$Time=="2022-07-30 19:00:00"&Test3$Site=="Reference"),3]),
+            mean(Test3[which(Test3$Time=="2022-07-30 20:00:00"&Test3$Site=="Reference"),3]),
+            mean(Test3[which(Test3$Time=="2022-07-30 21:00:00"&Test3$Site=="Reference"),3]),
+            mean(Test3[which(Test3$Time=="2022-07-30 22:00:00"&Test3$Site=="Reference"),3]),
+            mean(Test3[which(Test3$Time=="2022-07-30 23:00:00"&Test3$Site=="Reference"),3]))
+
+Test4[,2]=c("00:00:00",
+            "01:00:00",
+            "02:00:00",
+            "03:00:00",
+            "04:00:00",
+            "05:00:00",
+            "06:00:00",
+            "07:00:00",
+            "08:00:00",
+            "09:00:00",
+            "10:00:00",
+            "11:00:00",
+            "12:00:00",
+            "13:00:00",
+            "14:00:00",
+            "15:00:00",
+            "16:00:00",
+            "17:00:00",
+            "18:00:00",
+            "19:00:00",
+            "20:00:00",
+            "21:00:00",
+            "22:00:00",
+            "23:00:00")
+
+Test4[,2]=as.POSIXct(paste0("2022-07-30",Test4[,2],tz="GMT"))
+
+#Step 8.4: Repeat step 8.3 for the data in the contaminated site, in the sinking 
+#cages and in the floating cages.
+
+#Step 8.5: Graph the data over 24 hours with respect to the type of site
+
+#Note: Black points were added to illustrate the average's curve's minimum and
+#white points were added to illustrate the average's curve's maximum.
+
+#Reminder: the study plan defined the first dosing day as Day 4, not Day 0.
+#Therefore, all the codes were written based on that day notation.
+#However, an addendum to the study plan was made after writing the codes, which is
+#why the titles in the graphs might refer to the corrected day notation, while the 
+#codes still refer to the initial day notation.
+
+ggplot(Test2,mapping=aes(Time,Temperature))+
+  geom_point(aes(colour=Site))+
+  geom_path(Test4,mapping=aes(Time,Average),colour='blue',size=1.5)+
+  geom_path(Test5,mapping=aes(Time,Average),colour=c("#990033"),size=1.5)+
+  geom_point(data=Test4[which(Test4$Average==min(Test4$Average)),],aes(x=Time,y=Average),color='black',size=3)+
+  geom_point(data=Test4[which(Test4$Average==max(Test4$Average)),],aes(x=Time,y=Average),color='white',size=3)+
+  geom_point(data=Test5[which(Test5$Average==min(Test5$Average)),],aes(x=Time,y=Average),color='black',size=3)+
+  geom_point(data=Test5[which(Test5$Average==max(Test5$Average)),],aes(x=Time,y=Average),color='white',size=3)+
+  scale_x_datetime(date_labels="%H:%M",date_breaks="3 hour")+
+  scale_y_continuous(breaks=seq(20,37))+
+  labs(title="Water Temperatures (for Snail Cages only)",subtitle="Instrument: Data Loggers (TidbiT)")+
+  xlab("Time (Hours)")+
+  ylab("Temperature (°C)")+
+  theme(text = element_text(size = 20)) 
+
+
+#Step 8.6: Repeat step 8.5 with respect to the type of cage
+
+#Step 8.7: Prepare one dataset with all the data to graph linearly
+
+Test8=rbind(Day5,Day6,Day7,Day8,Day9,Day10,Day11,Day12,Day13,Day14,Day15,Day16,Day17)
+
+#Step 8.8: Graph the data linearly with respect to the type of site
+
+ggplot(Test8,mapping=aes(Time,Temperature))+
+  geom_point(aes(colour=Site))+
+  scale_x_datetime(date_labels="%b %d",date_breaks="1 day")+
+  scale_y_continuous(breaks=seq(20,37))+
+  labs(title="Water Temperatures (for Snail Cages only)",subtitle="Instrument: Data Loggers (TidbiT)")+
+  xlab("Time (Days)")+
+  ylab("Temperature (°C)")
+
+#Step 8.9: Repeat step 8.8 with respect to the type of cage
